@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Dashboard showing country data associated to Trading Economics ">
+    <meta name="author" content="Nsamba Taufeeq">
+    <meta name="keywords" content="trading economics demo site interview">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+
+
+    <title>Trading Economics-Demo</title>
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css"
+        integrity="sha512-RvQxwf+3zJuNwl4e0sZjQeX7kUa3o82bDETpgVCH2RiwYSZVDdFJ7N/woNigN/ldyOOoKw8584jM4plQdt8bhA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css"
+        integrity="sha512-aNH2ILn88yXgp/1dcFPt2/EkSNc03f9HBFX0rqX3Kw37+vjipi1pK3L9W08TZLhMg4Slk810sPLdJlNIjwygFw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="{{ url_for('static', filename='app.css') }}" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+        integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"
+        integrity="sha512-KZmyTq3PLx9EZl0RHShHQuXtrvdJ+m35tuOiwlcZfs/rE7NZv29ygNA8SFCkMXTnYZQK2OX0Gm2qKGfvWEtRXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+        <a class="navbar-brand nav-brand-text" href="#">Trading Economics</a>
+    </nav>
+    <div class="container" ng-app="Application">
+        <div class="row">
+            <div class="col-5">
+                <h4>Country GDP & Inflation</h4>
+                <div class="countries-container">
+                    {% for country in countries %}
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col mt-0">
+                                    <h6 class="card-title">{{country["name"]}}</h6>
+                                </div>
+
+                                <div class="col-auto">
+                                    <button class="btn btn-light btn-sm text-info view-more-btn"
+                                        data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="logCountry(this)"
+                                        data-country="{{country['name']}}">
+                                        <i class="fa fa-mouse-pointer"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="text-secondary font-weight-bold"><small>GDP &lpar;Billion USD&rpar;</small>
+                            </div>
+                            <h1 class="mt-1 mb-2">{{country["gdp"]}}</h1>
+                            <div class="mb-0">
+                                <span class="text-danger"> <i class="mdi mdi-arrow-bottom-right"></i>
+                                    <span>&#x25B2;</span> {{country["inflation"]}} &percnt;</span>
+                                <span class="text-muted">Since {{country["inflation_since"]}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-7">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="per-capita-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="card" ng-controller="newsctl">
+                    <div class="card-header">
+                        <h5 class="card-title">Latest News</h5>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-outline-info btn-sm mx-1" ng-click="selectCountry(country)"
+                            ng-repeat="country in countries">
+                            {a country a}
+                        </button>
+                    </div>
+                    <div class="comment-widgets scrollable">
+                        <div class="d-flex flex-row comment-row mt-0" ng-repeat="post in news">
+                            <div class="p-2">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="comment-text w-100">
+                                <div class="d-flex">
+                                    <div class="col-11">
+                                        <h6 class="font-medium">{a post["title"] a}</h6>
+
+                                    </div>
+                                    <div style="display: inline-block;" class="mr-auto text-muted float-end">
+                                        {a post["date"] a}
+                                    </div>
+                                </div>
+                                <span class="mb-3 d-block">
+                                    {a post["description"] a}
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'modal.jinja' %}
+</body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script>
+    const countries = {{ countries }}
+    const labels = countries.map(country => country["name"]);
+    const data = {
+        labels: labels,
+        datasets: [{
+            label: 'Country GDP per Capita',
+            backgroundColor: 'rgb(91, 192, 222)',
+            borderColor: 'rgb(91, 192, 222)',
+            data: countries.map(country => country["gdp_per_capita"]),
+        }]
+    };
+    const config = {
+        type: 'bar',
+        data: data,
+        options: {}
+    };
+    drawPerCapitaChart(document.getElementById("per-capita-chart"), config);
+    var app = angular.module('Application', []);
+    app.controller('newsctl', function ($scope, $http) {
+        $scope.countries = labels;
+        $scope.news = [];
+        $scope.selectCountry = (country) => {
+            $http({
+                method: 'Get',
+                url: '/news',
+                params: { country }
+            }).then(function (response) {
+
+                $scope.news = response.data;
+
+            }, function (error) {
+                $scope.message = 'Unexpected Error';
+            });
+        }
+        $scope.selectCountry("Mexico");
+    })
+
+    app.config(['$interpolateProvider', function ($interpolateProvider) {
+        $interpolateProvider.startSymbol('{a');
+        $interpolateProvider.endSymbol('a}');
+    }]);
+
+    var trendChart = new Chart(document.getElementById("trend-chart"), {
+        type:'line',
+        data: {
+            labels: ['2022-11-11','2022-11-12','2022-11-15'],
+            datasets: [{
+                label: 'Country GDP History',
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: [0, 10, 5],
+            }]
+        }
+    });
+    function logCountry(el) {
+        $("#exampleModalLabel").text("GDP Timeseries: " + el.dataset.country)
+        $.ajax({
+            url:"/history",
+            data:{country:el.dataset.country}
+        }).done((info)=>{
+            console.log(info);
+            trendChart.data.labels = info.map(item=>item["date"]);
+            trendChart.data.datasets[0]["data"]= info.map(item=>item["value"]);
+            trendChart.update();
+        });
+    }
+</script>
+
+</html>
